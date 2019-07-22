@@ -5,7 +5,7 @@ from .game_map import GameMap
 from .user import User
 from .position import Position
 from .network import Network
-from .constants import update_globals, CMD_ATTACK, CMD_BUILD, CMD_UPGRADE
+from .constants import update_globals, CMD_ATTACK, CMD_BUILD, CMD_UPGRADE, GAME_VERSION
 
 class Colorfight:
     def __init__(self):
@@ -26,7 +26,7 @@ class Colorfight:
         self.action_queue = queue.Queue()
         self.action_resp_queue = queue.Queue()
         if url == None:
-            url = 'https://colorfightii.herokuapp.com/gameroom/' + room
+            url = 'https://www.colorfightai.com/gameroom/' + room
         self.nw = Network(self.info_queue, self.action_queue, self.action_resp_queue, url)
         self.nw.setDaemon(True)
         self.nw.start()
@@ -62,7 +62,10 @@ class Colorfight:
             while not self.info_queue.empty():
                 info = self.info_queue.get()
             if info["turn"] != self.turn:
+                if info['info']['game_version'] != GAME_VERSION:
+                    print("Please update your bot. You can do git pull or download from the website.")
                 break
+                
         self._update(info)
 
     def register(self, username, password, join_key = ''):

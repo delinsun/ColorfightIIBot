@@ -1,7 +1,7 @@
 from colorfight import Colorfight
 import time
 import random
-from colorfight.constants import BLD_GOLD_MINE, BLD_ENERGY_WELL, BLD_FORTRESS
+from colorfight.constants import BLD_GOLD_MINE, BLD_ENERGY_WELL, BLD_FORTRESS, BUILDING_COST
 
 # Create a Colorfight Instance. This will be the object that you interact
 # with.
@@ -30,7 +30,14 @@ if game.register(username = 'ExampleAI' + str(random.randint(1, 100)), \
         # server. This will halt the program until it receives the updated
         # information. 
         # After update_turn(), game object will be updated.   
+        last_turn = game.turn
         game.update_turn()
+
+        # Turn number does not go back. So if it is going back, that means
+        # a new game. You can add a infinite loop to continuously register
+        # to the latest game and play.
+        if game.turn < last_turn:
+            break
 
         # Check if you exist in the game. If not, wait for the next round.
         # You may not appear immediately after you join. But you should be 
@@ -76,7 +83,7 @@ if game.register(username = 'ExampleAI' + str(random.randint(1, 100)), \
                 me.energy -= cell.building.upgrade_energy
                 
             # Build a random building if we have enough gold
-            if cell.owner == me.uid and cell.building.is_empty and me.gold >= 100:
+            if cell.owner == me.uid and cell.building.is_empty and me.gold >= BUILDING_COST[0]:
                 building = random.choice([BLD_FORTRESS, BLD_GOLD_MINE, BLD_ENERGY_WELL])
                 cmd_list.append(game.build(cell.position, building))
                 print("We build {} on ({}, {})".format(building, cell.position.x, cell.position.y))
